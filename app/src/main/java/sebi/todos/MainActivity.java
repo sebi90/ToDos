@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -15,10 +17,16 @@ import android.widget.ListView;
 import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class MainActivity extends Activity {
+    public static final String TODAY_ALL = "Today_All";
     private static final String LOG_TAG = "myDataBase";
+
+    private SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
 
     private EditText editTextTitle, editTextDescription, editTextDate;
 
@@ -42,7 +50,20 @@ public class MainActivity extends Activity {
     public void onClickSave(View view) {
         String title = editTextTitle.getText().toString();
         String description = editTextDescription.getText().toString();
-        String date= editTextDate.getText().toString();
+        String dateString = editTextDate.getText().toString();
+        long date = 0;
+
+        if(!dateString.isEmpty())
+        {
+            try
+            {
+                Date d = dateFormat.parse(dateString);
+                date = d.getTime();
+            }catch (ParseException e)
+            {
+                e.printStackTrace();
+            }
+        }
 
         doInsert(title, description, date);
 
@@ -55,8 +76,16 @@ public class MainActivity extends Activity {
     public void onClickAll(View view){
 
         Intent intent = new Intent(this, ListActivity.class);
+        intent.putExtra(TODAY_ALL, false);
         startActivity(intent);
 
+    }
+
+    public void onClickToday(View view)
+    {
+        Intent intent = new Intent(this, ListActivity.class);
+        intent.putExtra(TODAY_ALL, true);
+        startActivity(intent);
     }
 
     public void onClickCount(View view){
@@ -69,16 +98,23 @@ public class MainActivity extends Activity {
     }
 
 
-    private void doInsert(String title, String description, String datum)
+    private void doInsert(String title, String description, long datum)
     {
         SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
 
 
+
+
         ContentValues vals = new ContentValues();
-        if (datum.equals(""))
-            vals.put(DatabaseHelper.DATE_FIELD_NAME, System.currentTimeMillis());
+        if (datum == 0)
+            vals.put(DatabaseHelper.DATE_FIELD_NAME,
+                    dateFormat.format(new Date(System.currentTimeMillis())));
+                    //(new Date(System.currentTimeMillis())).toString());
+                    //System.currentTimeMillis());
         else
-            vals.put(DatabaseHelper.DATE_FIELD_NAME, datum);
+            vals.put(DatabaseHelper.DATE_FIELD_NAME,
+                    dateFormat.format(new Date(datum)).toString());
+                    //(new Date(datum)).toString());
 
         vals.put(DatabaseHelper.TITLE_FIELD_NAME, title);
         vals.put(DatabaseHelper.DESCR_FIELD_NAME, description);
@@ -86,6 +122,7 @@ public class MainActivity extends Activity {
         Log.d(LOG_TAG, "Datum aus vals: " + vals.getAsString(DatabaseHelper.DATE_FIELD_NAME));
 
         db.insert(DatabaseHelper.TABLE_NAME, null, vals);
+
 
 
         db.close();
@@ -97,7 +134,7 @@ public class MainActivity extends Activity {
     private void doDelete(){
         SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
 
-        int rows = db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.DATE_FIELD_NAME + " < date('now')", null);
+        int rows = db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.DATE_FIELD_NAME, null);
 
         Log.d(LOG_TAG, rows + " rows deleted");
         db.close();
