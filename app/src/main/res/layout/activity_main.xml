@@ -35,24 +35,23 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
+        android:layout_height="wrap_content">
 
         <Button
             android:id="@+id/buttonSave"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:onClick="onClickSave"
-            android:text="Save"
-            android:layout_weight="1"/>
+            android:text="@string/save" />
 
         <Button
             android:id="@+id/buttonReset"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:onClick="onClickReset"
-            android:text="Reset"
-            android:layout_weight="1"/>
+            android:text="@string/reset" />
     </LinearLayout>
 
     <LinearLayout
@@ -63,24 +62,24 @@
             android:id="@+id/buttonCount"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_weight="1"
             android:onClick="onClickCount"
-            android:text="Count"
-            android:layout_weight="1"/>
+            android:text="@string/count" />
 
         <Button
             android:id="@+id/buttonAll"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClickAll"
-            android:text="All"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:onClick="onClickAllToday"
+            android:text="@string/all" />
 
         <Button
             android:id="@+id/buttonToday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:onClick="onClickToday"
-            android:text="Today"
-            android:layout_weight="1"/>
+            android:layout_weight="1"
+            android:onClick="onClickAllToday"
+            android:text="@string/today" />
     </LinearLayout>
 </LinearLayout>

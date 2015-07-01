@@ -6,17 +6,12 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
-
-import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
-
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,14 +48,11 @@ public class MainActivity extends Activity {
         String dateString = editTextDate.getText().toString();
         long date = 0;
 
-        if(!dateString.isEmpty())
-        {
-            try
-            {
+        if (!dateString.isEmpty()) {
+            try {
                 Date d = dateFormat.parse(dateString);
                 date = d.getTime();
-            }catch (ParseException e)
-            {
+            } catch (ParseException e) {
                 e.printStackTrace();
             }
         }
@@ -69,52 +61,39 @@ public class MainActivity extends Activity {
 
     }
 
-    public void onClickReset(View view){
+    public void onClickReset(View view) {
         doDelete();
     }
 
-    public void onClickAll(View view){
-
+    public void onClickAllToday(View view) {
         Intent intent = new Intent(this, ListActivity.class);
-        intent.putExtra(TODAY_ALL, false);
-        startActivity(intent);
-
-    }
-
-    public void onClickToday(View view)
-    {
-        Intent intent = new Intent(this, ListActivity.class);
-        intent.putExtra(TODAY_ALL, true);
+        switch (view.getId()) {
+            case R.id.buttonAll:
+                intent.putExtra(TODAY_ALL, false);
+                break;
+            case R.id.buttonToday:
+                intent.putExtra(TODAY_ALL, true);
+                break;
+        }
         startActivity(intent);
     }
 
-    public void onClickCount(View view){
+    public void onClickCount(View view) {
 
         SQLiteDatabase db = new DatabaseHelper(this).getReadableDatabase();
-
         Cursor cursor = db.rawQuery("SELECT rowid _id,* FROM todo", null);
-
-        Toast.makeText(getApplicationContext(),cursor.getCount()+"" , Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), cursor.getCount() + "", Toast.LENGTH_SHORT).show();
     }
 
 
-    private void doInsert(String title, String description, long datum)
-    {
+    private void doInsert(String title, String description, long datum) {
         SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
-
-
-
 
         ContentValues vals = new ContentValues();
         if (datum == 0)
-            vals.put(DatabaseHelper.DATE_FIELD_NAME,
-                    dateFormat.format(new Date(System.currentTimeMillis())));
-                    //(new Date(System.currentTimeMillis())).toString());
-                    //System.currentTimeMillis());
+            vals.put(DatabaseHelper.DATE_FIELD_NAME, dateFormat.format(new Date(System.currentTimeMillis())));
         else
-            vals.put(DatabaseHelper.DATE_FIELD_NAME,
-                    dateFormat.format(new Date(datum)).toString());
-                    //(new Date(datum)).toString());
+            vals.put(DatabaseHelper.DATE_FIELD_NAME, dateFormat.format(new Date(datum)).toString());
 
         vals.put(DatabaseHelper.TITLE_FIELD_NAME, title);
         vals.put(DatabaseHelper.DESCR_FIELD_NAME, description);
@@ -123,15 +102,13 @@ public class MainActivity extends Activity {
 
         db.insert(DatabaseHelper.TABLE_NAME, null, vals);
 
-
-
         db.close();
         Log.d(LOG_TAG, "Eintrag: Title: " + title + " Description: " + description + " Datum: " + datum);
 
     }
 
 
-    private void doDelete(){
+    private void doDelete() {
         SQLiteDatabase db = new DatabaseHelper(this).getWritableDatabase();
 
         int rows = db.delete(DatabaseHelper.TABLE_NAME, DatabaseHelper.DATE_FIELD_NAME, null);
